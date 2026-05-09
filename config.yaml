@@ -1,0 +1,14 @@
+data:
+  seed: 42
+  data_path: HIFLD_Transmission_Lines.parquet
+model:
+  alpha: 0.6
+  voltage_capacity_map: null
+output:
+  figures_dir: images
+  figure_format: png
+  figure_dpi: 100
+  font_family: serif
+  figsize:
+  - 10
+  - 6

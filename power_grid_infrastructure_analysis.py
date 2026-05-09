@@ -14,6 +14,12 @@ from pathlib import Path
 from dataclasses import dataclass
 from typing import List, Dict, Any, Optional
 
+import logging
+logging.basicConfig(
+    level=logging.INFO,
+    format='%(asctime)s - %(levelname)s - %(message)s'
+)
+logger = logging.getLogger(__name__)
 np.random.seed(42)
 plt.rcParams.update({'font.family': 'serif','axes.spines.top': False,'axes.spines.right': False,'axes.linewidth': 0.8})
 
@@ -30,6 +36,24 @@ class Config:
             self.voltage_capacity_map = {
                 765: 2400, 500: 1200, 345: 600, 230: 300, 138: 150
             }
+
+def load_config(config_path=None) -> 'Config':
+    """Build Config from config.yaml, falling back to dataclass defaults."""
+    if config_path is None:
+        config_path = Path(__file__).parent / 'config.yaml'
+    if not config_path.exists():
+        return Config()
+    with open(config_path) as _f:
+        import yaml as _yaml
+        raw = _yaml.safe_load(_f) or {}
+    _d = raw.get('data', {})
+    _m = raw.get('model', {})
+    _o = raw.get('output', {})
+    return Config(
+        data_path=_d.get('data_path', 'HIFLD_Transmission_Lines.parquet'),
+        voltage_capacity_map=_m.get('voltage_capacity_map', None),
+    )
+
 
 def generate_synthetic_grid_data(n_lines: int = 50000) -> pd.DataFrame:
     """Generate synthetic transmission line data for demonstration"""
@@ -85,7 +109,7 @@ class TransmissionLinesService:
                 return pd.read_parquet(p)
             return pd.read_csv(p)
         
-        print(f"NOTE: {self.cfg.data_path} not found, using synthetic data\n")
+        logger.info(f"NOTE: {self.cfg.data_path} not found, using synthetic data\n")
         return generate_synthetic_grid_data()
     
     def get_statistics(self) -> Dict[str, Any]:
@@ -268,58 +292,58 @@ def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]]):
     save_fig('grid_voltage_hierarchy.png')
 
 def main():
-    cfg = Config()
+    cfg = load_config()
     service = TransmissionLinesService(cfg)
     
     # Grid statistics
     stats = service.get_statistics()
-    print(f"US Transmission Grid Statistics")
-    print(f"{'='*60}")
-    print(f"Total lines:      {stats['total_lines']:>10,}")
-    print(f"In service:       {stats['in_service']:>10,} ({stats['in_service']/stats['total_lines']*100:.1f}%)")
-    print(f"Network length:   {stats['total_miles']:>10,.0f} miles")
-    print(f"Average voltage:  {stats['avg_voltage']:>10,.0f} kV")
-    print(f"Unique owners:    {stats['unique_owners']:>10,}")
-    print(f"States covered:   {stats['states_covered']:>10,}")
-    print(f"Overhead lines:   {stats['overhead_pct']:>10,.1f}%")
+    logger.info(f"US Transmission Grid Statistics")
+    logger.info(f"{'='*60}")
+    logger.info(f"Total lines:      {stats['total_lines']:>10,}")
+    logger.info(f"In service:       {stats['in_service']:>10,} ({stats['in_service']/stats['total_lines']*100:.1f}%)")
+    logger.info(f"Network length:   {stats['total_miles']:>10,.0f} miles")
+    logger.info(f"Average voltage:  {stats['avg_voltage']:>10,.0f} kV")
+    logger.info(f"Unique owners:    {stats['unique_owners']:>10,}")
+    logger.info(f"States covered:   {stats['states_covered']:>10,}")
+    logger.info(f"Overhead lines:   {stats['overhead_pct']:>10,.1f}%")
     
     # Voltage hierarchy
-    print(f"\nVoltage Hierarchy Analysis")
-    print(f"{'='*60}")
+    logger.info(f"\nVoltage Hierarchy Analysis")
+    logger.info(f"{'='*60}")
     hierarchy = service.analyze_voltage_hierarchy()
     for category, metrics in hierarchy.items():
-        print(f"\n{category}")
-        print(f"  Lines: {metrics['count']:,} ({metrics['percentage']:.1f}%)")
-        print(f"  Miles: {metrics['miles']:,.0f}")
-        print(f"  Avg voltage: {metrics['avg_voltage']:.0f} kV")
-        print(f"  Owners: {metrics['owners']}")
+        logger.info(f"\n{category}")
+        logger.info(f"  Lines: {metrics['count']:,} ({metrics['percentage']:.1f}%)")
+        logger.info(f"  Miles: {metrics['miles']:,.0f}")
+        logger.info(f"  Avg voltage: {metrics['avg_voltage']:.0f} kV")
+        logger.info(f"  Owners: {metrics['owners']}")
     
     # Major utilities
-    print(f"\nTop 10 Transmission Owners")
-    print(f"{'='*60}")
+    logger.info(f"\nTop 10 Transmission Owners")
+    logger.info(f"{'='*60}")
     utilities = service.get_major_utilities(10)
     for _, row in utilities.iterrows():
-        print(f"{row['owner']:<25} {row['lines']:>6,} lines  {row['miles']:>8,.0f} mi  {row['avg_voltage']:>6.0f} kV")
+        logger.info(f"{row['owner']:<25} {row['lines']:>6,} lines  {row['miles']:>8,.0f} mi  {row['avg_voltage']:>6.0f} kV")
     
     # Critical corridors
-    print(f"\nTop 10 Critical Transmission Corridors")
-    print(f"{'='*60}")
+    logger.error(f"\nTop 10 Critical Transmission Corridors")
+    logger.info(f"{'='*60}")
     corridors = service.identify_critical_corridors(top_n=10)
     for _, c in corridors.iterrows():
-        print(f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}")
+        logger.error(f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}")
     
     # Capacity analysis
-    print(f"\nTransmission Capacity Analysis")
-    print(f"{'='*60}")
+    logger.info(f"\nTransmission Capacity Analysis")
+    logger.info(f"{'='*60}")
     sample_corridors = corridors['sub_1'].head(5).tolist()
     forecast_mw = 15000
     capacity = service.analyze_capacity(forecast_mw, sample_corridors)
-    print(f"Forecast load:    {capacity['forecast_mw']:>10,} MW")
-    print(f"Corridor capacity:{capacity['capacity_mw']:>10,} MW")
-    print(f"Utilization:      {capacity['utilization_pct']:>10.1f}%")
-    print(f"Adequate:         {capacity['adequate']}")
-    print(f"Corridors:        {capacity['corridor_count']:>10,} lines")
-    print(f"Avg voltage:      {capacity['avg_voltage']:>10.1f} kV")
+    logger.info(f"Forecast load:    {capacity['forecast_mw']:>10,} MW")
+    logger.info(f"Corridor capacity:{capacity['capacity_mw']:>10,} MW")
+    logger.info(f"Utilization:      {capacity['utilization_pct']:>10.1f}%")
+    logger.info(f"Adequate:         {capacity['adequate']}")
+    logger.info(f"Corridors:        {capacity['corridor_count']:>10,} lines")
+    logger.info(f"Avg voltage:      {capacity['avg_voltage']:>10.1f} kV")
     
     # Generate visualizations
     plot_voltage_distribution(service)
@@ -327,7 +351,7 @@ def main():
     plot_critical_corridors(service)
     plot_hierarchy_breakdown(hierarchy)
     
-    print(f"\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n")
+    logger.error(f"\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n")
 
 if __name__ == "__main__":
     main()
