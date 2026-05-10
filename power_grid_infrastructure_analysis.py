@@ -218,78 +218,82 @@ class TransmissionLinesService:
             'avg_voltage': round(corridor_lines['VOLTAGE'].mean(), 1)
         }
 
-def plot_voltage_distribution(service: TransmissionLinesService):
+def plot_voltage_distribution(service: TransmissionLinesService, plot: bool = False):
     """Visualize voltage class distribution"""
     dist = service.get_voltage_distribution()
     
-    plt.figure(figsize=(10, 6))
-    plt.barh(dist['voltage_class'], dist['count'], color='steelblue')
-    plt.xlabel('Number of Transmission Lines')
-    plt.ylabel('Voltage Class')
-    plt.title('US Transmission Grid: Voltage Class Distribution')
+    if plot:
+        plt.figure(figsize=(10, 6))
+        plt.barh(dist['voltage_class'], dist['count'], color='steelblue')
+        plt.xlabel('Number of Transmission Lines')
+        plt.ylabel('Voltage Class')
+        plt.title('US Transmission Grid: Voltage Class Distribution')
     
-    for i, (count, pct) in enumerate(zip(dist['count'], dist['percentage'])):
-        plt.text(count + max(dist['count'])*0.01, i, f'{count:,} ({pct:.1f}%)', va='center')
+        for i, (count, pct) in enumerate(zip(dist['count'], dist['percentage'])):
+            plt.text(count + max(dist['count'])*0.01, i, f'{count:,} ({pct:.1f}%)', va='center')
     
-    save_fig('grid_voltage_distribution.png')
+        save_fig('grid_voltage_distribution.png')
 
-def plot_utility_territories(service: TransmissionLinesService):
+def plot_utility_territories(service: TransmissionLinesService, plot: bool = False):
     """Visualize major utility territories"""
     utilities = service.get_major_utilities(top_n=10)
     
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    if plot:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     
     # Line counts
-    ax1.barh(utilities['owner'], utilities['lines'], color='darkorange')
-    ax1.set_xlabel('Number of Lines')
-    ax1.set_title('Top 10 Utilities by Line Count')
-    ax1.invert_yaxis()
+        ax1.barh(utilities['owner'], utilities['lines'], color='darkorange')
+        ax1.set_xlabel('Number of Lines')
+        ax1.set_title('Top 10 Utilities by Line Count')
+        ax1.invert_yaxis()
     
     # Network miles
-    ax2.barh(utilities['owner'], utilities['miles'], color='forestgreen')
-    ax2.set_xlabel('Network Miles')
-    ax2.set_title('Top 10 Utilities by Network Length')
-    ax2.invert_yaxis()
+        ax2.barh(utilities['owner'], utilities['miles'], color='forestgreen')
+        ax2.set_xlabel('Network Miles')
+        ax2.set_title('Top 10 Utilities by Network Length')
+        ax2.invert_yaxis()
     
-    save_fig('grid_utility_territories.png')
+        save_fig('grid_utility_territories.png')
 
-def plot_critical_corridors(service: TransmissionLinesService):
+def plot_critical_corridors(service: TransmissionLinesService, plot: bool = False):
     """Visualize critical transmission corridors"""
     corridors = service.identify_critical_corridors(top_n=15)
     
-    plt.figure(figsize=(12, 8))
+    if plot:
+        plt.figure(figsize=(12, 8))
     
     # Bubble chart: parallel lines vs voltage, sized by criticality
-    plt.scatter(corridors['max_voltage'], corridors['parallel_lines'], 
-                s=corridors['criticality']*10, alpha=0.6, c=corridors['criticality'],
-                cmap='Reds', edgecolors='black', linewidth=0.5)
+        plt.scatter(corridors['max_voltage'], corridors['parallel_lines'], 
+                    s=corridors['criticality']*10, alpha=0.6, c=corridors['criticality'],
+                    cmap='Reds', edgecolors='black', linewidth=0.5)
     
-    plt.xlabel('Maximum Voltage (kV)')
-    plt.ylabel('Number of Parallel Lines')
-    plt.title('Critical Transmission Corridors\n(bubble size = criticality score)')
-    plt.colorbar(label='Criticality Score')
+        plt.xlabel('Maximum Voltage (kV)')
+        plt.ylabel('Number of Parallel Lines')
+        plt.title('Critical Transmission Corridors\n(bubble size = criticality score)')
+        plt.colorbar(label='Criticality Score')
     
-    save_fig('grid_critical_corridors.png')
+        save_fig('grid_critical_corridors.png')
 
-def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]]):
+def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]], plot: bool = False):
     """Visualize voltage hierarchy breakdown"""
     categories = list(hierarchy.keys())
     counts = [h['count'] for h in hierarchy.values()]
     miles = [h['miles'] for h in hierarchy.values()]
     
-    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+    if plot:
+        fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
     
-    colors = ['#8B0000', '#FF4500', '#FFA500', '#FFD700']
+        colors = ['#8B0000', '#FF4500', '#FFA500', '#FFD700']
     
     # Line counts
-    ax1.pie(counts, labels=categories, autopct='%1.1f%%', colors=colors, startangle=90)
-    ax1.set_title('Transmission Lines by Voltage Class')
+        ax1.pie(counts, labels=categories, autopct='%1.1f%%', colors=colors, startangle=90)
+        ax1.set_title('Transmission Lines by Voltage Class')
     
     # Network miles
-    ax2.pie(miles, labels=categories, autopct='%1.0f mi', colors=colors, startangle=90)
-    ax2.set_title('Network Length by Voltage Class')
+        ax2.pie(miles, labels=categories, autopct='%1.0f mi', colors=colors, startangle=90)
+        ax2.set_title('Network Length by Voltage Class')
     
-    save_fig('grid_voltage_hierarchy.png')
+        save_fig('grid_voltage_hierarchy.png')
 
 def main():
     cfg = load_config()
