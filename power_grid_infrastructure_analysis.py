@@ -326,10 +326,10 @@ def main():
         logger.info(f"{row['owner']:<25} {row['lines']:>6,} lines  {row['miles']:>8,.0f} mi  {row['avg_voltage']:>6.0f} kV")
     
     # Critical corridors
-    logger.error(f"\nTop 10 Critical Transmission Corridors")
+    logger.error(f"\nTop 10 Critical Transmission Corridors", exc_info=True)
     corridors = service.identify_critical_corridors(top_n=10)
     for _, c in corridors.iterrows():
-        logger.error(f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}")
+        logger.error(f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}", exc_info=True)
     
     # Capacity analysis
     logger.info(f"\nTransmission Capacity Analysis")
@@ -349,7 +349,7 @@ def main():
     plot_critical_corridors(service)
     plot_hierarchy_breakdown(hierarchy)
     
-    logger.error(f"\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n")
+    logger.error(f"\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n", exc_info=True)
 
 if __name__ == "__main__":
     main()
