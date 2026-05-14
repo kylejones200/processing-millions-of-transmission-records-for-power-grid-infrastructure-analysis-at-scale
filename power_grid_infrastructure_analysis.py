@@ -7,6 +7,7 @@ For production, download the HIFLD dataset from:
 https://hifld-geoplatform.opendata.arcgis.com/
 """
 
+import signalplot
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
@@ -21,10 +22,8 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 np.random.seed(42)
-plt.rcParams.update({'font.family': 'serif','axes.spines.top': False,'axes.spines.right': False,'axes.linewidth': 0.8})
+signalplot.apply(font_family='serif')
 
-def save_fig(path: str):
-    plt.tight_layout(); plt.savefig(path, bbox_inches='tight'); plt.close()
 
 @dataclass
 class Config:
@@ -232,7 +231,7 @@ def plot_voltage_distribution(service: TransmissionLinesService, plot: bool = Fa
         for i, (count, pct) in enumerate(zip(dist['count'], dist['percentage'])):
             plt.text(count + max(dist['count'])*0.01, i, f'{count:,} ({pct:.1f}%)', va='center')
     
-        save_fig('grid_voltage_distribution.png')
+        signalplot.save('grid_voltage_distribution.png')
 
 def plot_utility_territories(service: TransmissionLinesService, plot: bool = False):
     """Visualize major utility territories"""
@@ -253,7 +252,7 @@ def plot_utility_territories(service: TransmissionLinesService, plot: bool = Fal
         ax2.set_title('Top 10 Utilities by Network Length')
         ax2.invert_yaxis()
     
-        save_fig('grid_utility_territories.png')
+        signalplot.save('grid_utility_territories.png')
 
 def plot_critical_corridors(service: TransmissionLinesService, plot: bool = False):
     """Visualize critical transmission corridors"""
@@ -272,7 +271,7 @@ def plot_critical_corridors(service: TransmissionLinesService, plot: bool = Fals
         plt.title('Critical Transmission Corridors\n(bubble size = criticality score)')
         plt.colorbar(label='Criticality Score')
     
-        save_fig('grid_critical_corridors.png')
+        signalplot.save('grid_critical_corridors.png')
 
 def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]], plot: bool = False):
     """Visualize voltage hierarchy breakdown"""
@@ -293,7 +292,7 @@ def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]], plot: bool 
         ax2.pie(miles, labels=categories, autopct='%1.0f mi', colors=colors, startangle=90)
         ax2.set_title('Network Length by Voltage Class')
     
-        save_fig('grid_voltage_hierarchy.png')
+        signalplot.save('grid_voltage_hierarchy.png')
 
 def main():
     cfg = load_config()
