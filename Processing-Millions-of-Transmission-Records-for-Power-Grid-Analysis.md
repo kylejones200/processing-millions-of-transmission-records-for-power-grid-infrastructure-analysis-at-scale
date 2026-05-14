@@ -12,8 +12,7 @@ This article demonstrates how to build a production-grade infrastructure visuali
 
 The HIFLD dataset provides unprecedented visibility into U.S. power transmission infrastructure. Unlike utility-proprietary data that requires NDAs and expensive contracts, HIFLD data is freely available and comprehensively covers the entire continental United States.
 
-**Key dataset characteristics:**
-- 300,000+ transmission line segments covering all voltage classes
+Key dataset characteristics:- 300,000+ transmission line segments covering all voltage classes
 - Geographic precision with start/end coordinates for every line
 - Ownership attribution linking lines to utilities and ISOs
 - Voltage classification from 100 kV distribution to 765 kV bulk transmission
@@ -28,36 +27,36 @@ See the complete implementation in `power_grid_infrastructure_analysis.py`.
 
 The system provides:
 
-1. **Data Service Layer**: High-performance queries across 300,000+ transmission records
-2. **Statistical Analysis**: Grid-wide metrics on voltage, ownership, and capacity
-3. **Voltage Hierarchy Analysis**: Understanding grid structure from 100 kV to 765 kV
-4. **Utility Territory Mapping**: Identifying ownership patterns and market structure
-5. **Critical Corridor Identification**: Finding high-capacity and single-point-of-failure paths
-6. **Capacity Analysis**: Comparing transmission capacity to load forecasts
-7. **GeoJSON Export**: Interactive visualization for web mapping
+1. Data Service Layer: High-performance queries across 300,000+ transmission records
+2. Statistical Analysis: Grid-wide metrics on voltage, ownership, and capacity
+3. Voltage Hierarchy Analysis: Understanding grid structure from 100 kV to 765 kV
+4. Utility Territory Mapping: Identifying ownership patterns and market structure
+5. Critical Corridor Identification: Finding high-capacity and single-point-of-failure paths
+6. Capacity Analysis: Comparing transmission capacity to load forecasts
+7. GeoJSON Export: Interactive visualization for web mapping
 
 ### Key Capabilities
 
-**Grid Statistics**:
+Grid Statistics:
 - Total line counts and network length
 - Voltage class distribution
 - Overhead vs underground breakdown
 - In-service vs proposed/decommissioned
 - Owner/utility counts
 
-**Voltage Hierarchy**:
+Voltage Hierarchy:
 - Ultra-High Voltage (≥500 kV): Bulk transmission backbone
 - Extra-High Voltage (345-499 kV): Regional interconnections
 - High Voltage (220-344 kV): Load center connections
 - Sub-Transmission (100-219 kV): Distribution system feeds
 
-**Critical Corridors**:
+Critical Corridors:
 - Parallel line identification (redundancy)
 - Single-line corridors (reliability risks)
 - Criticality scoring for maintenance prioritization
 - Maximum voltage and capacity per corridor
 
-**Capacity Analysis**:
+Capacity Analysis:
 - Voltage-to-capacity mapping (765 kV → 2400 MW per line)
 - Corridor-level capacity calculations
 - Load forecast comparisons
@@ -82,46 +81,46 @@ Track in-service vs proposed lines. Monitor compliance with reliability standard
 
 ## Performance Characteristics
 
-- **Load Time**: Sub-second for Parquet, ~5 seconds for CSV (300K records)
-- **Query Performance**: Millisecond response for filtered queries
-- **Memory Footprint**: ~500 MB for full dataset in memory
-- **Visualization Export**: 10,000 lines export in <2 seconds
-- **Capacity Analysis**: Real-time calculations across multiple corridors
+- Load Time: Sub-second for Parquet, ~5 seconds for CSV (300K records)
+- Query Performance: Millisecond response for filtered queries
+- Memory Footprint: ~500 MB for full dataset in memory
+- Visualization Export: 10,000 lines export in <2 seconds
+- Capacity Analysis: Real-time calculations across multiple corridors
 
 ## Data Sources
 
-**Primary**: HIFLD Electric Power Transmission Lines
+Primary: HIFLD Electric Power Transmission Lines
 - https://hifld-geoplatform.opendata.arcgis.com/
 - Updated quarterly
 - GeoJSON, CSV, and Parquet formats available
 
-**Supplementary**:
+Supplementary:
 - EIA Form 860 for plant-level capacity data
 - NERC Transmission Availability Data System (TADS)
 - Utility-specific asset management databases
 
 ## Implementation Strategy
 
-1. **Data Acquisition**: Download HIFLD transmission dataset and convert to Parquet
-2. **Service Layer**: Implement query, filter, and aggregation methods
-3. **Analysis Functions**: Build voltage, ownership, and corridor analytics
-4. **Visualization**: Export GeoJSON for Leaflet/Mapbox/Kepler.gl integration
-5. **API Deployment**: Expose queries via REST API for real-time access
-6. **Integration**: Combine with load forecasts, weather, and outage data
+1. Data Acquisition: Download HIFLD transmission dataset and convert to Parquet
+2. Service Layer: Implement query, filter, and aggregation methods
+3. Analysis Functions: Build voltage, ownership, and corridor analytics
+4. Visualization: Export GeoJSON for Leaflet/Mapbox/Kepler.gl integration
+5. API Deployment: Expose queries via REST API for real-time access
+6. Integration: Combine with load forecasts, weather, and outage data
 
 ## Key Takeaways
 
-**1. Public Data Provides Comprehensive Coverage**: HIFLD's 300,000+ line segments eliminate the need for proprietary utility data. Infrastructure visibility is now publicly accessible.
+1. Public Data Provides Comprehensive Coverage: HIFLD's 300,000+ line segments eliminate the need for proprietary utility data. Infrastructure visibility is now publicly accessible.
 
-**2. Parquet Format Enables Scale**: Columnar storage makes multi-million record queries instant. Infrastructure analysis becomes interactive rather than batch-oriented.
+2. Parquet Format Enables Scale: Columnar storage makes multi-million record queries instant. Infrastructure analysis becomes interactive rather than batch-oriented.
 
-**3. Voltage Hierarchy Reveals Grid Structure**: Understanding the distinction between ultra-high voltage (500+ kV) bulk transmission and sub-transmission (100-219 kV) guides capacity planning.
+3. Voltage Hierarchy Reveals Grid Structure: Understanding the distinction between ultra-high voltage (500+ kV) bulk transmission and sub-transmission (100-219 kV) guides capacity planning.
 
-**4. Ownership Patterns Explain Coordination**: Fragmented ownership complicates operations. Mapping territorial boundaries reveals coordination challenges and market structure.
+4. Ownership Patterns Explain Coordination: Fragmented ownership complicates operations. Mapping territorial boundaries reveals coordination challenges and market structure.
 
-**5. Spatial Analysis Identifies Critical Paths**: Parallel line counts indicate redundancy. Single-line corridors represent reliability risks. Criticality scoring prioritizes interventions.
+5. Spatial Analysis Identifies Critical Paths: Parallel line counts indicate redundancy. Single-line corridors represent reliability risks. Criticality scoring prioritizes interventions.
 
-**6. Capacity Integration Links Infrastructure to Operations**: Combining transmission capacity with load forecasts reveals constraints before blackouts. Proactive planning replaces reactive crisis management.
+6. Capacity Integration Links Infrastructure to Operations: Combining transmission capacity with load forecasts reveals constraints before blackouts. Proactive planning replaces reactive crisis management.
 
 ## Conclusion
 

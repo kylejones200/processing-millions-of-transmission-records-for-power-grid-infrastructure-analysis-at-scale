@@ -15,12 +15,12 @@ This article demonstrates how to build a working infrastructure visualization sy
 The HIFLD dataset provides unprecedented visibility into U.S. power transmission infrastructure. Unlike utility-proprietary data that requires NDAs and expensive contracts, HIFLD data is freely available and comprehensively covers the entire continental United States.
 
 Key dataset characteristics:
-- **300,000+ transmission line segments** covering all voltage classes
-- **Geographic precision** with start/end coordinates for every line
-- **Ownership attribution** linking lines to utilities and ISOs
-- **Voltage classification** from 100 kV distribution to 765 kV bulk transmission
-- **Status tracking** distinguishing in-service from proposed/decommissioned lines
-- **Substation connectivity** mapping which lines connect at which nodes
+- 300,000+ transmission line segments covering all voltage classes
+- Geographic precision with start/end coordinates for every line
+- Ownership attribution linking lines to utilities and ISOs
+- Voltage classification from 100 kV distribution to 765 kV bulk transmission
+- Status tracking distinguishing in-service from proposed/decommissioned lines
+- Substation connectivity mapping which lines connect at which nodes
 
 The dataset arrives as either a massive CSV or optimized Parquet file. The Parquet format enables high-performance columnar queries that make multi-million record datasets manageable.
 
@@ -34,37 +34,37 @@ This capacity analysis identifies transmission constraints before they cause rel
 
 Processing millions of transmission records enables grid-scale infrastructure intelligence:
 
-**1. Public Data Provides Comprehensive Coverage**: HIFLD's transmission dataset covers 300,000+ line segments across all voltage classes. Infrastructure visibility no longer requires proprietary utility data.
+1. Public Data Provides Comprehensive Coverage: HIFLD's transmission dataset covers 300,000+ line segments across all voltage classes. Infrastructure visibility no longer requires proprietary utility data.
 
-**2. Parquet Format Enables Scale**: Columnar storage makes multi-million record datasets queryable in milliseconds. Infrastructure analysis becomes interactive rather than batch-oriented.
+2. Parquet Format Enables Scale: Columnar storage makes multi-million record datasets queryable in milliseconds. Infrastructure analysis becomes interactive rather than batch-oriented.
 
-**3. Voltage Hierarchy Reveals Grid Structure**: Ultra-high voltage lines (500+ kV) form the bulk transmission backbone. Understanding hierarchy guides capacity planning and reliability analysis.
+3. Voltage Hierarchy Reveals Grid Structure: Ultra-high voltage lines (500+ kV) form the bulk transmission backbone. Understanding hierarchy guides capacity planning and reliability analysis.
 
-**4. Ownership Patterns Explain Coordination Challenges**: Fragmented ownership complicates grid operations. Mapping territorial boundaries reveals why certain regions struggle with coordinated response.
+4. Ownership Patterns Explain Coordination Challenges: Fragmented ownership complicates grid operations. Mapping territorial boundaries reveals why certain regions struggle with coordinated response.
 
-**5. Spatial Analysis Identifies Critical Corridors**: Parallel line counts indicate redundancy. Single-line corridors represent reliability risks. Criticality scoring prioritizes maintenance and upgrades.
+5. Spatial Analysis Identifies Critical Corridors: Parallel line counts indicate redundancy. Single-line corridors represent reliability risks. Criticality scoring prioritizes maintenance and upgrades.
 
-**6. Capacity Integration Links Infrastructure to Operations**: Combining transmission capacity with load forecasts reveals constraints before they cause blackouts. Proactive planning replaces reactive crisis management.
+6. Capacity Integration Links Infrastructure to Operations: Combining transmission capacity with load forecasts reveals constraints before they cause blackouts. Proactive planning replaces reactive crisis management.
 
 ## Implementation Strategy
 
 Deploy infrastructure analysis in your grid operations:
 
-1. **Data Acquisition**: Download HIFLD transmission lines dataset. Convert CSV to Parquet for optimal performance.
+1. Data Acquisition: Download HIFLD transmission lines dataset. Convert CSV to Parquet for optimal performance.
 
-2. **Service Layer**: Implement TransmissionLinesService with query, filter, and analysis methods.
+2. Service Layer: Implement TransmissionLinesService with query, filter, and analysis methods.
 
-3. **Statistical Analysis**: Calculate voltage distribution, owner profiles, and geographic coverage.
+3. Statistical Analysis: Calculate voltage distribution, owner profiles, and geographic coverage.
 
-4. **Spatial Analysis**: Identify critical corridors, parallel line counts, and redundancy metrics.
+4. Spatial Analysis: Identify critical corridors, parallel line counts, and redundancy metrics.
 
-5. **Capacity Analysis**: Map transmission capacity to voltage classes. Compare against load forecasts.
+5. Capacity Analysis: Map transmission capacity to voltage classes. Compare against load forecasts.
 
-6. **Visualization**: Export GeoJSON for interactive mapping. Integrate with Leaflet or Kepler.gl.
+6. Visualization: Export GeoJSON for interactive mapping. Integrate with Leaflet or Kepler.gl.
 
-7. **Integration**: Combine infrastructure data with load forecasts, outage tracking, and weather overlays.
+7. Integration: Combine infrastructure data with load forecasts, outage tracking, and weather overlays.
 
-8. **API Deployment**: Expose transmission queries via REST API. Enable real-time grid exploration.
+8. API Deployment: Expose transmission queries via REST API. Enable real-time grid exploration.
 
 The infrastructure analysis system described here handles 300,000+ transmission lines, identifies critical corridors, and integrates with load forecasting to reveal capacity constraints. The code provides implementations that process queries in milliseconds.
 

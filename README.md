@@ -1,7 +1,7 @@
 # Processing Millions of Transmission Records for Power Grid Infrastructure Analysis at Scale
 
-**Published:** draft
-**Medium:** [https://medium.com/@kyle-t-jones/processing-millions-of-transmission-records-for-power-grid-infrastructure-analysis-at-scale-fa3808997787](https://medium.com/@kyle-t-jones/processing-millions-of-transmission-records-for-power-grid-infrastructure-analysis-at-scale-fa3808997787)
+Published: draft
+Medium: [https://medium.com/@kyle-t-jones/processing-millions-of-transmission-records-for-power-grid-infrastructure-analysis-at-scale-fa3808997787](https://medium.com/@kyle-t-jones/processing-millions-of-transmission-records-for-power-grid-infrastructure-analysis-at-scale-fa3808997787)
 
 ## About
 
