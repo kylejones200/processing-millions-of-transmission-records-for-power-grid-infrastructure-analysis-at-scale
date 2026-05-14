@@ -302,8 +302,7 @@ def main():
     # Grid statistics
     stats = service.get_statistics()
     logger.info(f"US Transmission Grid Statistics")
-    logger.info(f"{'='*60}")
-    logger.info(f"Total lines:      {stats['total_lines']:>10,}")
+    logger.info("=== Total lines:      {stats['total_lines']:>10,} ===")
     logger.info(f"In service:       {stats['in_service']:>10,} ({stats['in_service']/stats['total_lines']*100:.1f}%)")
     logger.info(f"Network length:   {stats['total_miles']:>10,.0f} miles")
     logger.info(f"Average voltage:  {stats['avg_voltage']:>10,.0f} kV")
@@ -313,7 +312,6 @@ def main():
     
     # Voltage hierarchy
     logger.info(f"\nVoltage Hierarchy Analysis")
-    logger.info(f"{'='*60}")
     hierarchy = service.analyze_voltage_hierarchy()
     for category, metrics in hierarchy.items():
         logger.info(f"\n{category}")
@@ -324,21 +322,18 @@ def main():
     
     # Major utilities
     logger.info(f"\nTop 10 Transmission Owners")
-    logger.info(f"{'='*60}")
     utilities = service.get_major_utilities(10)
     for _, row in utilities.iterrows():
         logger.info(f"{row['owner']:<25} {row['lines']:>6,} lines  {row['miles']:>8,.0f} mi  {row['avg_voltage']:>6.0f} kV")
     
     # Critical corridors
     logger.error(f"\nTop 10 Critical Transmission Corridors")
-    logger.info(f"{'='*60}")
     corridors = service.identify_critical_corridors(top_n=10)
     for _, c in corridors.iterrows():
         logger.error(f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}")
     
     # Capacity analysis
     logger.info(f"\nTransmission Capacity Analysis")
-    logger.info(f"{'='*60}")
     sample_corridors = corridors['sub_1'].head(5).tolist()
     forecast_mw = 15000
     capacity = service.analyze_capacity(forecast_mw, sample_corridors)
