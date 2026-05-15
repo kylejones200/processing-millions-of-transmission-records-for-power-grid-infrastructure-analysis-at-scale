@@ -35,9 +35,8 @@ import json
 from typing import List, Dict, Any, Optional
 import logging
 import os
-```
 
-``` 
+
 logger = logging.getLogger(__name__)
 ```
 
@@ -385,40 +384,35 @@ class TransmissionLinesService:
                 coords.append([float(end_lon), float(end_lat)])
         
         return coords
-```
 
-``` 
+
 # Example usage
 service = TransmissionLinesService("HIFLD_Transmission_Lines.parquet")
-```
 
-``` 
+
 # Get comprehensive statistics
 stats = service.get_statistics()
 print(f"Total Transmission Lines: {stats['total_lines']:,}")
 print(f"Total Network Length: {stats['total_length_miles']:,.0f} miles")
 print(f"Average Voltage: {stats['avg_voltage']:.0f} kV")
 print(f"Unique Owners: {stats['unique_owners']:,}")
-```
 
-``` 
+
 # Analyze major utilities
 major_utilities = service.get_major_utilities(limit=10)
 print("\nTop 10 Utilities by Line Count:")
 for utility in major_utilities:
     print(f"  {utility['name'][:40]:40s} | {utility['line_count']:>6,} lines | {utility['total_miles']:>8,.0f} miles")
-```
 
-``` 
+
 # Analyze grid connectivity
 connectivity = service.analyze_grid_connectivity()
 print(f"\nGrid Connectivity Analysis:")
 print(f"  Backbone lines (>=345 kV): {connectivity['backbone_lines']:,} ({connectivity['backbone_percentage']:.1f}%)")
 print(f"  Unique substations: {connectivity['unique_substations']:,}")
 print(f"  Maximum parallel lines: {connectivity.get('max_parallel_lines', 'N/A')}")
-```
 
-``` 
+
 ```
 
 This service provides the foundation for all infrastructure analysis operations. The Parquet format enables sub-second queries across millions of records, making interactive exploration practical.
@@ -468,29 +462,25 @@ def identify_critical_corridors(service: TransmissionLinesService,
     corridors = corridors.sort_values('criticality_score', ascending=False)
     
     return corridors
-```
 
-``` 
+
 # Example usage
 corridors_df = identify_critical_corridors(service, min_voltage=345)
-```
 
-``` 
+
 print("Top 10 Critical Transmission Corridors:")
 print(f"{'Substation 1':<30} {'Substation 2':<30} {'Lines':<6} {'Max kV':<8} {'Score':<6}")
 print("-" * 90)
-```
 
-``` 
+
 for _, corridor in corridors_df.head(10).iterrows():
     print(f"{str(corridor['substation_1'])[:28]:<30} "
           f"{str(corridor['substation_2'])[:28]:<30} "
           f"{corridor['parallel_lines']:<6} "
           f"{corridor['max_voltage']:<8.0f} "
           f"{corridor['criticality_score']:<6.1f}")
-```
 
-``` 
+
 ```
 
 This analysis reveals the transmission backbone --- the corridors that carry bulk power across regions. Operators can use these insights to prioritize maintenance, plan upgrades, and prepare contingency responses.
@@ -532,19 +522,16 @@ def analyze_voltage_hierarchy(service: TransmissionLinesService) -> Dict[str, An
             }
     
     return analysis
-```
 
-``` 
+
 # Run analysis
 hierarchy = analyze_voltage_hierarchy(service)
-```
 
-``` 
+
 print("Transmission Grid Voltage Hierarchy:")
 print("=" * 90)
-```
 
-``` 
+
 for category, stats in hierarchy.items():
     print(f"\n{category}")
     print(f"  Lines: {stats['line_count']:,} ({stats['percentage']:.1f}% of total)")
@@ -552,9 +539,8 @@ for category, stats in hierarchy.items():
     print(f"  Average voltage: {stats['avg_voltage']:.0f} kV")
     print(f"  Unique owners: {stats['unique_owners']}")
     print(f"  Overhead: {stats['overhead_percentage']:.1f}%")
-```
 
-``` 
+
 ```
 
 Understanding voltage hierarchy is crucial for load forecasting and capacity planning. Ultra-high voltage lines (500+ kV) move bulk power across regions. Extra-high voltage (345--499 kV) forms the regional transmission backbone. High voltage (220--344 kV) connects load centers. Sub-transmission (100--219 kV) delivers power to distribution systems.
@@ -603,29 +589,25 @@ def map_utility_territories(service: TransmissionLinesService,
     utility_profile = utility_profile.nlargest(top_n, 'total_lines')
     
     return utility_profile
-```
 
-``` 
+
 # Generate utility territory map
 territories = map_utility_territories(service, top_n=15)
-```
 
-``` 
+
 print("Major Transmission Owners:")
 print(f"{'Utility':<40} {'Lines':<8} {'Miles':<10} {'Avg kV':<8} {'In Service':<10}")
 print("-" * 90)
-```
 
-``` 
+
 for _, row in territories.iterrows():
     print(f"{str(row['owner'])[:38]:<40} "
           f"{row['total_lines']:<8,} "
           f"{row['total_miles']:<10,.0f} "
           f"{row['avg_voltage']:<8.0f} "
           f"{row['in_service_pct']:<10.1f}%")
-```
 
-``` 
+
 ```
 
 This analysis reveals market structure and coordination requirements. Large multi-state utilities operate integrated networks. Regional transmission organizations (RTOs) coordinate across dozens of utilities. Identifying ownership boundaries helps explain why certain regions face reliability challenges --- fragmented ownership complicates coordinated operations.
@@ -674,14 +656,12 @@ def create_interactive_grid_map(service: TransmissionLinesService,
     print(f"  Total available: {geojson_data['metadata']['total_available']:,}")
     
     return output_file
-```
 
-``` 
+
 # Create map
 map_file = create_interactive_grid_map(service)
-```
 
-``` 
+
 ```
 
 The GeoJSON output integrates with Leaflet, Mapbox, or Kepler.gl for rich interactive visualization. Users can zoom to regions, filter by voltage or owner, and overlay load forecast data to identify capacity constraints.
@@ -755,33 +735,28 @@ def analyze_corridor_capacity(service: TransmissionLinesService,
         analysis['capacity_adequate'] = analysis['utilization_pct'] < 80  # 80% threshold
     
     return analysis
-```
 
-``` 
+
 # Example capacity analysis
 forecast_mw = 28500  # Peak forecast load
 region_corridors = ['SUBSTATION_A', 'SUBSTATION_B', 'SUBSTATION_C']
-```
 
-``` 
+
 capacity = analyze_corridor_capacity(service, forecast_mw, region_corridors)
-```
 
-``` 
+
 print(f"\nTransmission Capacity Analysis")
 print(f"Forecast Peak Load: {capacity['forecast_load_mw']:,} MW")
 print(f"Total Corridor Capacity: {capacity['total_capacity_mw']:,} MW")
 print(f"Utilization: {capacity['utilization_pct']:.1f}%")
 print(f"Capacity Adequate: {'Yes' if capacity['capacity_adequate'] else 'No'}")
-```
 
-``` 
+
 print(f"\nCorridor Breakdown:")
 for corridor in capacity['corridors']:
     print(f"  {corridor['id']}: {corridor['capacity_mw']:,} MW ({corridor['line_count']} lines)")
-```
 
-``` 
+
 ```
 
 This capacity analysis identifies transmission constraints before they cause reliability problems. When forecast load approaches 80% of corridor capacity, operators can prepare contingency plans or curtail non-essential load.
