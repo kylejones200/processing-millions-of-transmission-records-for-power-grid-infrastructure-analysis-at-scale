@@ -13,7 +13,7 @@ import pandas as pd
 import matplotlib.pyplot as plt
 from pathlib import Path
 from dataclasses import dataclass
-from typing import List, Dict, Any, Optional
+from typing import Any
 
 import logging
 logging.basicConfig(
@@ -27,7 +27,7 @@ signalplot.apply(font_family='serif')
 @dataclass
 class Config:
     data_path: str = "HIFLD_Transmission_Lines.parquet"
-    voltage_capacity_map: Dict[int, int] = None
+    voltage_capacity_map: dict[int, int] = None
     
     def __post_init__(self):
         if self.voltage_capacity_map is None:
@@ -110,7 +110,7 @@ class TransmissionLinesService:
         logger.info(f"NOTE: {self.cfg.data_path} not found, using synthetic data\n")
         return generate_synthetic_grid_data()
     
-    def get_statistics(self) -> Dict[str, Any]:
+    def get_statistics(self) -> dict[str, Any]:
         """Calculate comprehensive grid statistics"""
         df = self.data
         
@@ -134,7 +134,7 @@ class TransmissionLinesService:
             'percentage': (vc.values / len(self.data) * 100).round(2)
         })
     
-    def analyze_voltage_hierarchy(self) -> Dict[str, Dict[str, float]]:
+    def analyze_voltage_hierarchy(self) -> dict[str, dict[str, float]]:
         """Analyze grid by voltage hierarchy"""
         df = self.data
         
@@ -194,7 +194,7 @@ class TransmissionLinesService:
         
         return corridors.nlargest(top_n, 'criticality')
     
-    def analyze_capacity(self, forecast_mw: float, corridor_ids: List[str]) -> Dict[str, Any]:
+    def analyze_capacity(self, forecast_mw: float, corridor_ids: list[str]) -> dict[str, Any]:
         """Analyze corridor capacity vs forecast load"""
         df = self.data
         corridor_lines = df[df['SUB_1'].isin(corridor_ids) | df['SUB_2'].isin(corridor_ids)]
@@ -272,7 +272,7 @@ def plot_critical_corridors(service: TransmissionLinesService, plot: bool = Fals
     
         signalplot.save('grid_critical_corridors.png')
 
-def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]], plot: bool = False):
+def plot_hierarchy_breakdown(hierarchy: dict[str, dict[str, float]], plot: bool = False):
     """Visualize voltage hierarchy breakdown"""
     categories = list(hierarchy.keys())
     counts = [h['count'] for h in hierarchy.values()]
@@ -300,7 +300,7 @@ def main():
     
     # Grid statistics
     stats = service.get_statistics()
-    logger.info(f"US Transmission Grid Statistics")
+    logger.info("US Transmission Grid Statistics")
     logger.info("=== Total lines:      {stats['total_lines']:>10,} ===")
     logger.info(f"In service:       {stats['in_service']:>10,} ({stats['in_service']/stats['total_lines']*100:.1f}%)")
     logger.info(f"Network length:   {stats['total_miles']:>10,.0f} miles")
@@ -310,7 +310,7 @@ def main():
     logger.info(f"Overhead lines:   {stats['overhead_pct']:>10,.1f}%")
     
     # Voltage hierarchy
-    logger.info(f"\nVoltage Hierarchy Analysis")
+    logger.info("\nVoltage Hierarchy Analysis")
     hierarchy = service.analyze_voltage_hierarchy()
     for category, metrics in hierarchy.items():
         logger.info(f"\n{category}")
@@ -320,19 +320,19 @@ def main():
         logger.info(f"  Owners: {metrics['owners']}")
     
     # Major utilities
-    logger.info(f"\nTop 10 Transmission Owners")
+    logger.info("\nTop 10 Transmission Owners")
     utilities = service.get_major_utilities(10)
     for _, row in utilities.iterrows():
         logger.info(f"{row['owner']:<25} {row['lines']:>6,} lines  {row['miles']:>8,.0f} mi  {row['avg_voltage']:>6.0f} kV")
     
     # Critical corridors
-    logger.error(f"\nTop 10 Critical Transmission Corridors", exc_info=True)
+    logger.error("\nTop 10 Critical Transmission Corridors", exc_info=True)
     corridors = service.identify_critical_corridors(top_n=10)
     for _, c in corridors.iterrows():
         logger.error(f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}", exc_info=True)
     
     # Capacity analysis
-    logger.info(f"\nTransmission Capacity Analysis")
+    logger.info("\nTransmission Capacity Analysis")
     sample_corridors = corridors['sub_1'].head(5).tolist()
     forecast_mw = 15000
     capacity = service.analyze_capacity(forecast_mw, sample_corridors)
@@ -349,7 +349,7 @@ def main():
     plot_critical_corridors(service)
     plot_hierarchy_breakdown(hierarchy)
     
-    logger.error(f"\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n", exc_info=True)
+    logger.error("\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n", exc_info=True)
 
 if __name__ == "__main__":
     main()
