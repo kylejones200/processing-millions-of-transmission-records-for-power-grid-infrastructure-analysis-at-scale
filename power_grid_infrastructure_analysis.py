@@ -21,7 +21,6 @@ logging.basicConfig(
     format='%(asctime)s - %(levelname)s - %(message)s'
 )
 logger = logging.getLogger(__name__)
-np.random.seed(42)
 signalplot.apply(font_family='serif')
 
 
@@ -295,6 +294,7 @@ def plot_hierarchy_breakdown(hierarchy: Dict[str, Dict[str, float]], plot: bool 
         signalplot.save('grid_voltage_hierarchy.png')
 
 def main():
+    np.random.seed(42)
     cfg = load_config()
     service = TransmissionLinesService(cfg)
     
