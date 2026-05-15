@@ -1,3 +1,8 @@
+---
+canonical_link: "https://medium.com/p/fa3808997787"
+date_exported_from_medium: "November 10, 2025"
+---
+
 # Processing Millions of Transmission Records for Power Grid Infrastructure Analysis at Scale 50 million people across eight U.S. states and two Canadian provinces
 lost power when some tree branches touched a sagging transmission...
 
@@ -801,7 +806,3 @@ Deploy infrastructure analysis in your grid operations:
 The infrastructure analysis system described here handles 300,000+ transmission lines, identifies critical corridors, and integrates with load forecasting to reveal capacity constraints. The code provides production-ready implementations that process queries in milliseconds.
 
 When transmission failures threaten grid reliability, comprehensive infrastructure visibility means the difference between controlled response and cascading blackouts. This system gives operators the intelligence to keep power flowing.
-
-\ [View original.](https://medium.com/p/fa3808997787)
-
-Exported from [Medium](https://medium.com) on November 10, 2025.
