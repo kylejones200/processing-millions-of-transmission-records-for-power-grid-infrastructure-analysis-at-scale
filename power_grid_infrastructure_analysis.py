@@ -265,7 +265,7 @@ class TransmissionLinesService:
         ]
 
         total_capacity = 0
-        for _, line in corridor_lines.iterrows():
+        for line in corridor_lines.itertuples(index=False):
             voltage = line["VOLTAGE"]
             closest_v = min(
                 self.cfg.voltage_capacity_map.keys(), key=lambda x: abs(x - voltage)
@@ -414,15 +414,15 @@ def main():
     # Major utilities
     logger.info("\nTop 10 Transmission Owners")
     utilities = service.get_major_utilities(10)
-    for _, row in utilities.iterrows():
+    for row in utilities.itertuples(index=False):
         logger.info(
-            f"{row['owner']:<25} {row['lines']:>6,} lines  {row['miles']:>8,.0f} mi  {row['avg_voltage']:>6.0f} kV"
+            f"{row.owner:<25} {row.lines:>6,} lines  {row.miles:>8,.0f} mi  {row.avg_voltage:>6.0f} kV"
         )
 
     # Critical corridors
     logger.error("\nTop 10 Critical Transmission Corridors", exc_info=True)
     corridors = service.identify_critical_corridors(top_n=10)
-    for _, c in corridors.iterrows():
+    for c in corridors.itertuples(index=False):
         logger.error(
             f"{c['sub_1']:<12} - {c['sub_2']:<12} | {c['parallel_lines']:>2} lines | {c['max_voltage']:>3.0f} kV | Score: {c['criticality']:>4.1f}",
             exc_info=True,
