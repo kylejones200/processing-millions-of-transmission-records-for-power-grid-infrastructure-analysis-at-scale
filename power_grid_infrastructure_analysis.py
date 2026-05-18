@@ -17,9 +17,7 @@ import numpy as np
 import pandas as pd
 import signalplot
 
-logging.basicConfig(
-    level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s"
-)
+logging.basicConfig(level=logging.INFO, format="%(asctime)s - %(levelname)s - %(message)s")
 logger = logging.getLogger(__name__)
 signalplot.apply(font_family="serif")
 
@@ -62,7 +60,6 @@ def load_config(config_path=None) -> "Config":
 def generate_synthetic_grid_data(n_lines: int = 50000) -> pd.DataFrame:
     """Generate synthetic transmission line data for demonstration"""
     np.random.seed(42)
-
     voltage_classes = [
         (765, "765"),
         (500, "500"),
@@ -87,11 +84,9 @@ def generate_synthetic_grid_data(n_lines: int = 50000) -> pd.DataFrame:
         "FirstEnergy",
         "Xcel Energy",
     ]
-
     states = ["TX", "CA", "PA", "IL", "OH", "NC", "GA", "FL", "NY", "MI"]
     statuses = ["IN SERVICE"] * 90 + ["PROPOSED"] * 8 + ["DECOMMISSIONED"] * 2
     types = ["OVERHEAD"] * 95 + ["UNDERGROUND"] * 5
-
     data = {
         "ID": np.arange(1, n_lines + 1),
         "VOLTAGE": np.random.choice(
@@ -110,13 +105,10 @@ def generate_synthetic_grid_data(n_lines: int = 50000) -> pd.DataFrame:
         "SUB_1": [f"SUB_{np.random.randint(1, 1000)}" for _ in range(n_lines)],
         "SUB_2": [f"SUB_{np.random.randint(1, 1000)}" for _ in range(n_lines)],
     }
-
     df = pd.DataFrame(data)
-
     # Map voltage to voltage class
     voltage_map = {v[0]: v[1] for v in voltage_classes}
     df["VOLT_CLASS"] = df["VOLTAGE"].map(voltage_map)
-
     return df
 
 
@@ -130,7 +122,6 @@ class TransmissionLinesService:
     def _load_data(self) -> pd.DataFrame:
         """Load transmission lines from Parquet/CSV or generate synthetic"""
         p = Path(self.cfg.data_path)
-
         if p.exists():
             if p.suffix == ".parquet":
                 return pd.read_parquet(p)
@@ -142,7 +133,6 @@ class TransmissionLinesService:
     def get_statistics(self) -> dict[str, Any]:
         """Calculate comprehensive grid statistics"""
         df = self.data
-
         return {
             "total_lines": len(df),
             "in_service": len(df[df["STATUS"] == "IN SERVICE"]),
@@ -150,10 +140,7 @@ class TransmissionLinesService:
             "avg_voltage": df["VOLTAGE"].mean(),
             "unique_owners": df["OWNER"].nunique(),
             "states_covered": df["STATE"].nunique(),
-            "overhead_pct": (
-                df["TYPE"].str.contains("OVERHEAD", na=False).sum() / len(df)
-            )
-            * 100,
+            "overhead_pct": (df["TYPE"].str.contains("OVERHEAD", na=False).sum() / len(df)) * 100,
             "voltage_classes": df["VOLT_CLASS"].nunique(),
         }
 
@@ -171,18 +158,12 @@ class TransmissionLinesService:
     def analyze_voltage_hierarchy(self) -> dict[str, dict[str, float]]:
         """Analyze grid by voltage hierarchy"""
         df = self.data
-
         categories = {
             "Ultra-High (>=500 kV)": df[df["VOLTAGE"] >= 500],
-            "Extra-High (345-499 kV)": df[
-                (df["VOLTAGE"] >= 345) & (df["VOLTAGE"] < 500)
-            ],
+            "Extra-High (345-499 kV)": df[(df["VOLTAGE"] >= 345) & (df["VOLTAGE"] < 500)],
             "High (220-344 kV)": df[(df["VOLTAGE"] >= 220) & (df["VOLTAGE"] < 345)],
-            "Sub-Transmission (100-219 kV)": df[
-                (df["VOLTAGE"] >= 100) & (df["VOLTAGE"] < 220)
-            ],
+            "Sub-Transmission (100-219 kV)": df[(df["VOLTAGE"] >= 100) & (df["VOLTAGE"] < 220)],
         }
-
         result = {}
         for name, lines in categories.items():
             if len(lines) > 0:
@@ -210,7 +191,6 @@ class TransmissionLinesService:
             )
             .reset_index()
         )
-
         utility_stats.columns = [
             "owner",
             "lines",
@@ -220,23 +200,16 @@ class TransmissionLinesService:
         ]
         utility_stats["miles"] = (utility_stats["total_length"] / 5280).round(0)
         utility_stats = utility_stats.nlargest(top_n, "lines")
+        return utility_stats[["owner", "lines", "miles", "avg_voltage", "voltage_classes"]]
 
-        return utility_stats[
-            ["owner", "lines", "miles", "avg_voltage", "voltage_classes"]
-        ]
-
-    def identify_critical_corridors(
-        self, min_voltage: int = 345, top_n: int = 20
-    ) -> pd.DataFrame:
+    def identify_critical_corridors(self, min_voltage: int = 345, top_n: int = 20) -> pd.DataFrame:
         """Identify critical transmission corridors"""
         df = self.data[self.data["VOLTAGE"] >= min_voltage].copy()
-
         corridors = (
             df.groupby(["SUB_1", "SUB_2"])
             .agg({"ID": "count", "VOLTAGE": ["mean", "max"], "SHAPE__Length": "sum"})
             .reset_index()
         )
-
         corridors.columns = [
             "sub_1",
             "sub_2",
@@ -245,35 +218,25 @@ class TransmissionLinesService:
             "max_voltage",
             "total_length",
         ]
-
         # Criticality score: voltage (40%) + redundancy (40%) + length (20%)
         corridors["criticality"] = (
             (corridors["max_voltage"] / 765) * 40
             + (corridors["parallel_lines"] / corridors["parallel_lines"].max()) * 40
             + (corridors["total_length"] / corridors["total_length"].max()) * 20
         )
-
         return corridors.nlargest(top_n, "criticality")
 
-    def analyze_capacity(
-        self, forecast_mw: float, corridor_ids: list[str]
-    ) -> dict[str, Any]:
+    def analyze_capacity(self, forecast_mw: float, corridor_ids: list[str]) -> dict[str, Any]:
         """Analyze corridor capacity vs forecast load"""
         df = self.data
-        corridor_lines = df[
-            df["SUB_1"].isin(corridor_ids) | df["SUB_2"].isin(corridor_ids)
-        ]
-
+        corridor_lines = df[df["SUB_1"].isin(corridor_ids) | df["SUB_2"].isin(corridor_ids)]
         total_capacity = 0
         for line in corridor_lines.itertuples(index=False):
             voltage = line["VOLTAGE"]
-            closest_v = min(
-                self.cfg.voltage_capacity_map.keys(), key=lambda x: abs(x - voltage)
-            )
+            closest_v = min(self.cfg.voltage_capacity_map.keys(), key=lambda x: abs(x - voltage))
             total_capacity += self.cfg.voltage_capacity_map[closest_v]
 
         utilization = (forecast_mw / total_capacity * 100) if total_capacity > 0 else 0
-
         return {
             "forecast_mw": forecast_mw,
             "capacity_mw": total_capacity,
@@ -287,14 +250,12 @@ class TransmissionLinesService:
 def plot_voltage_distribution(service: TransmissionLinesService, plot: bool = False):
     """Visualize voltage class distribution"""
     dist = service.get_voltage_distribution()
-
     if plot:
         plt.figure(figsize=(10, 6))
         plt.barh(dist["voltage_class"], dist["count"], color="steelblue")
         plt.xlabel("Number of Transmission Lines")
         plt.ylabel("Voltage Class")
         plt.title("US Transmission Grid: Voltage Class Distribution")
-
         for i, (count, pct) in enumerate(zip(dist["count"], dist["percentage"])):
             plt.text(
                 count + max(dist["count"]) * 0.01,
@@ -309,32 +270,26 @@ def plot_voltage_distribution(service: TransmissionLinesService, plot: bool = Fa
 def plot_utility_territories(service: TransmissionLinesService, plot: bool = False):
     """Visualize major utility territories"""
     utilities = service.get_major_utilities(top_n=10)
-
     if plot:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-
         # Line counts
         ax1.barh(utilities["owner"], utilities["lines"], color="darkorange")
         ax1.set_xlabel("Number of Lines")
         ax1.set_title("Top 10 Utilities by Line Count")
         ax1.invert_yaxis()
-
         # Network miles
         ax2.barh(utilities["owner"], utilities["miles"], color="forestgreen")
         ax2.set_xlabel("Network Miles")
         ax2.set_title("Top 10 Utilities by Network Length")
         ax2.invert_yaxis()
-
         signalplot.save("grid_utility_territories.png")
 
 
 def plot_critical_corridors(service: TransmissionLinesService, plot: bool = False):
     """Visualize critical transmission corridors"""
     corridors = service.identify_critical_corridors(top_n=15)
-
     if plot:
         plt.figure(figsize=(12, 8))
-
         # Bubble chart: parallel lines vs voltage, sized by criticality
         plt.scatter(
             corridors["max_voltage"],
@@ -346,40 +301,27 @@ def plot_critical_corridors(service: TransmissionLinesService, plot: bool = Fals
             edgecolors="black",
             linewidth=0.5,
         )
-
         plt.xlabel("Maximum Voltage (kV)")
         plt.ylabel("Number of Parallel Lines")
         plt.title("Critical Transmission Corridors\n(bubble size = criticality score)")
         plt.colorbar(label="Criticality Score")
-
         signalplot.save("grid_critical_corridors.png")
 
 
-def plot_hierarchy_breakdown(
-    hierarchy: dict[str, dict[str, float]], plot: bool = False
-):
+def plot_hierarchy_breakdown(hierarchy: dict[str, dict[str, float]], plot: bool = False):
     """Visualize voltage hierarchy breakdown"""
     categories = list(hierarchy.keys())
     counts = [h["count"] for h in hierarchy.values()]
     miles = [h["miles"] for h in hierarchy.values()]
-
     if plot:
         fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
-
         colors = ["#8B0000", "#FF4500", "#FFA500", "#FFD700"]
-
         # Line counts
-        ax1.pie(
-            counts, labels=categories, autopct="%1.1f%%", colors=colors, startangle=90
-        )
+        ax1.pie(counts, labels=categories, autopct="%1.1f%%", colors=colors, startangle=90)
         ax1.set_title("Transmission Lines by Voltage Class")
-
         # Network miles
-        ax2.pie(
-            miles, labels=categories, autopct="%1.0f mi", colors=colors, startangle=90
-        )
+        ax2.pie(miles, labels=categories, autopct="%1.0f mi", colors=colors, startangle=90)
         ax2.set_title("Network Length by Voltage Class")
-
         signalplot.save("grid_voltage_hierarchy.png")
 
 
@@ -387,7 +329,6 @@ def main():
     np.random.seed(42)
     cfg = load_config()
     service = TransmissionLinesService(cfg)
-
     # Grid statistics
     stats = service.get_statistics()
     logger.info("US Transmission Grid Statistics")
@@ -400,7 +341,6 @@ def main():
     logger.info(f"Unique owners:    {stats['unique_owners']:>10,}")
     logger.info(f"States covered:   {stats['states_covered']:>10,}")
     logger.info(f"Overhead lines:   {stats['overhead_pct']:>10,.1f}%")
-
     # Voltage hierarchy
     logger.info("\nVoltage Hierarchy Analysis")
     hierarchy = service.analyze_voltage_hierarchy()
@@ -439,13 +379,11 @@ def main():
     logger.info(f"Adequate:         {capacity['adequate']}")
     logger.info(f"Corridors:        {capacity['corridor_count']:>10,} lines")
     logger.info(f"Avg voltage:      {capacity['avg_voltage']:>10.1f} kV")
-
     # Generate visualizations
     plot_voltage_distribution(service)
     plot_utility_territories(service)
     plot_critical_corridors(service)
     plot_hierarchy_breakdown(hierarchy)
-
     logger.error(
         "\nOutputs: grid_voltage_distribution.png, grid_utility_territories.png, grid_critical_corridors.png, grid_voltage_hierarchy.png\n",
         exc_info=True,
