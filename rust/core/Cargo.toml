@@ -1,0 +1,9 @@
+[package]
+name = "processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_core"
+description = "Group sum aggregation by integer keys"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+path = "src/lib.rs"

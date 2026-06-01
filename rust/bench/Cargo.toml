@@ -1,0 +1,13 @@
+[package]
+name = "processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_bench"
+description = "Standalone Rust benchmark (no Python)"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[[bin]]
+name = "bench"
+path = "src/main.rs"
+
+[dependencies]
+processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_core = { path = "../core" }

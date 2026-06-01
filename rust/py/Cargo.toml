@@ -1,0 +1,15 @@
+[package]
+name = "processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_rs"
+description = "Python bindings (PyO3) for processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_core"
+version.workspace = true
+edition.workspace = true
+license.workspace = true
+
+[lib]
+name = "processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_rs"
+crate-type = ["cdylib"]
+
+[dependencies]
+processing_millions_of_transmission_records_for_power_grid_infrastructure_analysis_at_scale_core = { path = "../core" }
+pyo3 = { version = "0.28", features = ["extension-module"] }
+numpy = "0.28"
